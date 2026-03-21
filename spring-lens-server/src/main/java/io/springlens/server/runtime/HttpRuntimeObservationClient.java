@@ -1,10 +1,12 @@
 package io.springlens.server.runtime;
 
 import io.springlens.model.AppRegistration;
-import io.springlens.model.diagnostic.ExceptionContextRecord;
 import io.springlens.model.core.ExecutionGraph;
 import io.springlens.model.ProjectToolDescriptor;
 import io.springlens.model.ProjectToolSchemaDescriptor;
+import io.springlens.model.RuntimeToolDescriptor;
+import io.springlens.model.RuntimeToolSchemaDescriptor;
+import io.springlens.model.diagnostic.ExceptionContextRecord;
 import io.springlens.model.diagnostic.ProbeValueRecord;
 import io.springlens.model.diagnostic.SlowSqlRecord;
 import java.util.List;
@@ -87,10 +89,45 @@ public class HttpRuntimeObservationClient implements RuntimeObservationClient {
     }
 
     @Override
+    public List<RuntimeToolDescriptor> listRuntimeTools(AppRegistration registration) {
+        return restClient.get()
+                .uri(UriComponentsBuilder.fromUri(registration.runtimeBaseUrl())
+                        .path("/internal/spring-lens/tools")
+                        .build(true)
+                        .toUri())
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
+    }
+
+    @Override
+    public List<RuntimeToolSchemaDescriptor> listRuntimeToolSchemas(AppRegistration registration) {
+        return restClient.get()
+                .uri(UriComponentsBuilder.fromUri(registration.runtimeBaseUrl())
+                        .path("/internal/spring-lens/tools/schema")
+                        .build(true)
+                        .toUri())
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
+    }
+
+    @Override
     public Object invokeProjectTool(AppRegistration registration, String toolName, Map<String, Object> arguments) {
         return restClient.post()
                 .uri(UriComponentsBuilder.fromUri(registration.runtimeBaseUrl())
                         .path("/internal/spring-lens/project-tools/{toolName}:invoke")
+                        .build(toolName))
+                .body(Map.of("arguments", arguments == null ? Map.of() : arguments))
+                .retrieve()
+                .body(Object.class);
+    }
+
+    @Override
+    public Object invokeRuntimeTool(AppRegistration registration, String toolName, Map<String, Object> arguments) {
+        return restClient.post()
+                .uri(UriComponentsBuilder.fromUri(registration.runtimeBaseUrl())
+                        .path("/internal/spring-lens/tools/{toolName}:invoke")
                         .build(toolName))
                 .body(Map.of("arguments", arguments == null ? Map.of() : arguments))
                 .retrieve()
