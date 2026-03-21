@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: spring-lens-server
+  ai:
+    mcp:
+      server:
+        enabled: true
+        name: spring-lens
+        version: 0.1.0
+        instructions: "Spring Lens exposes structured runtime diagnostics for Spring Boot applications."
+
+server:
+  port: 8090

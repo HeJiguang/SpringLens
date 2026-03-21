@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: spring-lens-demo
+  datasource:
+    url: jdbc:h2:mem:springlens;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+spring.lens:
+  application-id: spring-lens-demo
+  instance-id: spring-lens-demo-1
+  slow-sql-threshold-ms: 10
+  registration-enabled: false

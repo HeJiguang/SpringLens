@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Lens Runtime Console</title>
+    <link rel="stylesheet" href="/lens/lens.css">
+</head>
+<body>
+<div class="page-shell">
+    <div class="hero-glow hero-glow-a"></div>
+    <div class="hero-glow hero-glow-b"></div>
+
+    <header class="hero">
+        <div class="hero-copy">
+            <p class="eyebrow">Spring Lens Demo Runtime Console</p>
+            <h1>AI Runtime Operating System</h1>
+            <p class="hero-text">
+                This page is a live runtime lab for the demo app. It lets you trigger the implemented
+                Spring Lens features, inspect structured runtime facts, and understand which AI-facing
+                MCP capabilities those facts enable.
+            </p>
+            <div class="hero-pills">
+                <span class="pill pill-accent">Execution Graph</span>
+                <span class="pill pill-accent">Slow SQL</span>
+                <span class="pill pill-accent">Exception Context</span>
+                <span class="pill pill-accent">Programmable Probes</span>
+                <span class="pill pill-accent">Project Tools</span>
+            </div>
+        </div>
+        <aside class="hero-panel">
+            <div class="hero-panel-label">Live Demo Context</div>
+            <dl class="stat-list">
+                <div>
+                    <dt>Runtime Base</dt>
+                    <dd id="runtime-base">loading...</dd>
+                </div>
+                <div>
+                    <dt>Last Action</dt>
+                    <dd id="last-action">None</dd>
+                </div>
+                <div>
+                    <dt>Last Graph</dt>
+                    <dd id="last-graph-id">None</dd>
+                </div>
+                <div>
+                    <dt>Health</dt>
+                    <dd id="health-badge"><span class="pill pill-muted">Checking</span></dd>
+                </div>
+            </dl>
+        </aside>
+    </header>
+
+    <main class="content-grid">
+        <section class="card">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">What Is Already Working</p>
+                    <h2>Implemented Runtime Capabilities</h2>
+                </div>
+            </div>
+            <div class="capability-grid">
+                <article class="capability-card">
+                    <h3>Runtime Observability</h3>
+                    <p>Captures HTTP request context, JDBC slow SQL, and exception events as structured runtime facts.</p>
+                </article>
+                <article class="capability-card">
+                    <h3>Execution Graph</h3>
+                    <p>Builds a graph of runtime nodes and edges so AI systems can correlate cause, path, and outcome.</p>
+                </article>
+                <article class="capability-card">
+                    <h3>Programmable Probes</h3>
+                    <p>Supports <code>@LensWatch</code> and <code>Lens.look(...)</code> to expose business-level runtime values.</p>
+                </article>
+                <article class="capability-card">
+                    <h3>Project Tools</h3>
+                    <p>Supports <code>@LensTool</code> so application code can expose callable diagnostic functions.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">What AI Can Use</p>
+                    <h2>MCP-Facing Capability Map</h2>
+                </div>
+            </div>
+            <div class="mapping-grid">
+                <article class="mapping-card">
+                    <h3>Slow SQL Path</h3>
+                    <p>Page action: <strong>Trigger Slow SQL</strong></p>
+                    <p>AI tools: <code>get_slow_sql</code>, <code>get_execution_graph</code></p>
+                </article>
+                <article class="mapping-card">
+                    <h3>Exception Path</h3>
+                    <p>Page action: <strong>Trigger Exception</strong></p>
+                    <p>AI tools: <code>get_exception_context</code>, <code>get_diagnostic_playbook</code></p>
+                </article>
+                <article class="mapping-card">
+                    <h3>Probe Path</h3>
+                    <p>Page action: <strong>Trigger Probe</strong></p>
+                    <p>AI tools: <code>query_probe_values</code>, <code>get_execution_graph</code></p>
+                </article>
+                <article class="mapping-card">
+                    <h3>Project Tool Path</h3>
+                    <p>Page action: <strong>Invoke Project Tool</strong></p>
+                    <p>AI tools: <code>list_project_tools</code>, <code>invoke_project_tool</code></p>
+                </article>
+            </div>
+        </section>
+
+        <section class="card full-span">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">Interactive Console</p>
+                    <h2>Run Runtime Experiments</h2>
+                </div>
+                <button class="secondary-button" id="refresh-health">Refresh Health</button>
+            </div>
+            <div class="action-grid">
+                <button class="action-button" data-action="load-order">
+                    <span class="action-title">Load Order</span>
+                    <span class="action-desc">Call <code>GET /orders/1</code> and show the baseline business response.</span>
+                </button>
+                <button class="action-button" data-action="slow-sql">
+                    <span class="action-title">Trigger Slow SQL</span>
+                    <span class="action-desc">Execute the demo slow SQL path and pull the resulting SQL record plus graph.</span>
+                </button>
+                <button class="action-button" data-action="exception">
+                    <span class="action-title">Trigger Exception</span>
+                    <span class="action-desc">Deliberately hit the failing path and inspect captured exception context.</span>
+                </button>
+                <button class="action-button" data-action="probe">
+                    <span class="action-title">Trigger Probe</span>
+                    <span class="action-desc">Run the demo probe flow and inspect <code>@LensWatch</code> plus manual probe values.</span>
+                </button>
+                <button class="action-button" data-action="project-tool">
+                    <span class="action-title">Invoke Project Tool</span>
+                    <span class="action-desc">List project tools and invoke <code>count_orders_by_status</code> with <code>PAID</code>.</span>
+                </button>
+            </div>
+            <div class="feedback-row">
+                <div id="action-status" class="feedback-chip neutral">No action has been run yet.</div>
+                <div id="error-banner" class="feedback-chip error hidden"></div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">Result Panel</p>
+                    <h2>Business Response</h2>
+                </div>
+            </div>
+            <div id="business-response" class="result-block empty-state">Run an action to populate this panel.</div>
+        </section>
+
+        <section class="card">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">Result Panel</p>
+                    <h2>Slow SQL</h2>
+                </div>
+            </div>
+            <div id="slow-sql-result" class="result-block empty-state">No slow SQL result yet.</div>
+        </section>
+
+        <section class="card">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">Result Panel</p>
+                    <h2>Exception Context</h2>
+                </div>
+            </div>
+            <div id="exception-result" class="result-block empty-state">No exception context yet.</div>
+        </section>
+
+        <section class="card">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">Result Panel</p>
+                    <h2>Probe Values</h2>
+                </div>
+            </div>
+            <div id="probe-result" class="result-block empty-state">No probe data yet.</div>
+        </section>
+
+        <section class="card">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">Result Panel</p>
+                    <h2>Project Tool</h2>
+                </div>
+            </div>
+            <div id="tool-result" class="result-block empty-state">No project tool invocation yet.</div>
+        </section>
+
+        <section class="card full-span">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">Execution Graph</p>
+                    <h2>Latest Runtime Graph</h2>
+                </div>
+            </div>
+            <div id="graph-summary" class="graph-grid">
+                <div class="result-block empty-state">Run a runtime-producing action to populate the graph.</div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="/lens/lens.js"></script>
+</body>
+</html>
