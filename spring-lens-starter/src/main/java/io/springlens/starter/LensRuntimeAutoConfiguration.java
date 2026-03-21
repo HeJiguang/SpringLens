@@ -9,11 +9,13 @@ import io.springlens.runtime.RuntimeSignalProcessor;
 import io.springlens.spi.DefaultDiagnosticEngine;
 import io.springlens.spi.DiagnosticEngine;
 import io.springlens.spi.DiagnosticEngineSelectionStrategy;
+import io.springlens.spi.LensCapability;
 import io.springlens.spi.PriorityDiagnosticEngineSelectionStrategy;
 import io.springlens.spi.RuntimeCollector;
 import io.springlens.spi.RoutingDiagnosticEngine;
 import io.springlens.spi.SelectableDiagnosticEngine;
 import io.springlens.spi.SkillGenerator;
+import io.springlens.starter.capability.LensCapabilityRegistry;
 import io.springlens.starter.probe.LensDiagnosticTool;
 import io.springlens.starter.probe.DefaultSkillGenerator;
 import io.springlens.starter.probe.LensProbeAspect;
@@ -157,6 +159,11 @@ public class LensRuntimeAutoConfiguration {
     }
 
     @Bean
+    public LensCapabilityRegistry lensCapabilityRegistry(List<LensCapability> capabilities) {
+        return new LensCapabilityRegistry(capabilities);
+    }
+
+    @Bean
     @ConditionalOnMissingBean(SkillGenerator.class)
     public SkillGenerator skillGenerator(
             InMemoryExecutionGraphStore graphStore,
@@ -225,12 +232,13 @@ public class LensRuntimeAutoConfiguration {
             LensRuntimeProperties properties,
             LensProbeRegistry probeRegistry,
             LensProjectToolRegistry projectToolRegistry,
+            LensCapabilityRegistry capabilityRegistry,
             Environment environment
     ) {
         if (properties.getApplicationId() == null || properties.getApplicationId().isBlank()) {
             properties.setApplicationId(environment.getProperty("spring.application.name", "spring-lens-app"));
         }
-        return new RuntimeQueryController(graphStore, properties, probeRegistry, projectToolRegistry);
+        return new RuntimeQueryController(graphStore, properties, probeRegistry, projectToolRegistry, capabilityRegistry);
     }
 
     @Bean

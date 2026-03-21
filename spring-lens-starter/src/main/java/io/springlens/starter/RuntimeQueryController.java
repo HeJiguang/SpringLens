@@ -5,9 +5,13 @@ import io.springlens.model.core.ExecutionGraph;
 import io.springlens.model.ProjectToolDescriptor;
 import io.springlens.model.ProjectToolSchemaDescriptor;
 import io.springlens.model.ProbeDescriptor;
+import io.springlens.model.RuntimeCapabilityDescriptor;
+import io.springlens.model.RuntimeToolDescriptor;
+import io.springlens.model.RuntimeToolSchemaDescriptor;
 import io.springlens.model.diagnostic.ProbeValueRecord;
 import io.springlens.model.diagnostic.SlowSqlRecord;
 import io.springlens.runtime.InMemoryExecutionGraphStore;
+import io.springlens.starter.capability.LensCapabilityRegistry;
 import io.springlens.starter.probe.LensProbeRegistry;
 import io.springlens.starter.probe.LensProjectToolRegistry;
 import java.util.List;
@@ -36,17 +40,20 @@ public class RuntimeQueryController {
     private final LensRuntimeProperties properties;
     private final LensProbeRegistry probeRegistry;
     private final LensProjectToolRegistry projectToolRegistry;
+    private final LensCapabilityRegistry capabilityRegistry;
 
     public RuntimeQueryController(
             InMemoryExecutionGraphStore graphStore,
             LensRuntimeProperties properties,
             LensProbeRegistry probeRegistry,
-            LensProjectToolRegistry projectToolRegistry
+            LensProjectToolRegistry projectToolRegistry,
+            LensCapabilityRegistry capabilityRegistry
     ) {
         this.graphStore = graphStore;
         this.properties = properties;
         this.probeRegistry = probeRegistry;
         this.projectToolRegistry = projectToolRegistry;
+        this.capabilityRegistry = capabilityRegistry;
     }
 
     /**
@@ -91,6 +98,29 @@ public class RuntimeQueryController {
     /**
      * @return 提取内存在某一个探针上抓取到的所有真实值（活体变量）。
      */
+    @GetMapping("/capabilities")
+    public List<RuntimeCapabilityDescriptor> getCapabilities() {
+        return capabilityRegistry.capabilities();
+    }
+
+    @GetMapping("/tools")
+    public List<RuntimeToolDescriptor> getTools() {
+        return capabilityRegistry.tools();
+    }
+
+    @GetMapping("/tools/schema")
+    public List<RuntimeToolSchemaDescriptor> getToolSchemas() {
+        return capabilityRegistry.toolSchemas();
+    }
+
+    @PostMapping("/tools/{toolName}:invoke")
+    public Object invokeTool(
+            @PathVariable String toolName,
+            @RequestBody(required = false) ToolInvocationRequest request
+    ) {
+        return capabilityRegistry.invoke(toolName, request == null ? Map.of() : request.arguments());
+    }
+
     @GetMapping("/probe-values")
     public List<ProbeValueRecord> getProbeValues(
             @RequestParam(required = false) String probeId,
