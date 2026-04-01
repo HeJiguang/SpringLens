@@ -1,11 +1,14 @@
 package io.springlens.starter;
 
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationHandler;
 import io.springlens.runtime.ExceptionCollector;
 import io.springlens.runtime.HttpRequestCollector;
 import io.springlens.runtime.InMemoryExecutionGraphStore;
 import io.springlens.runtime.JdbcSlowSqlCollector;
 import io.springlens.runtime.ProbeValueCollector;
 import io.springlens.runtime.RuntimeSignalProcessor;
+import io.springlens.spi.CapabilityToolGenerator;
 import io.springlens.spi.DefaultDiagnosticEngine;
 import io.springlens.spi.DiagnosticEngine;
 import io.springlens.spi.DiagnosticEngineSelectionStrategy;
@@ -14,27 +17,33 @@ import io.springlens.spi.PriorityDiagnosticEngineSelectionStrategy;
 import io.springlens.spi.RuntimeCollector;
 import io.springlens.spi.RoutingDiagnosticEngine;
 import io.springlens.spi.SelectableDiagnosticEngine;
-import io.springlens.spi.SkillGenerator;
+import io.springlens.starter.capability.AnnotationToolCapability;
+import io.springlens.starter.capability.DefaultCapabilityToolGenerator;
+import io.springlens.starter.capability.GeneratedToolCapability;
 import io.springlens.starter.capability.LensCapabilityRegistry;
-import io.springlens.starter.probe.LensDiagnosticTool;
-import io.springlens.starter.probe.DefaultSkillGenerator;
+import io.springlens.starter.capability.RequestDiagnosisCapability;
+import io.springlens.starter.capability.RuntimeSafetyCapability;
+import io.springlens.starter.capability.RuntimeSafetyInspector;
+import io.springlens.starter.observation.LensObservationContextAccessor;
+import io.springlens.starter.observation.LensObservationExecutionBridge;
+import io.springlens.starter.observation.LensObservationHandler;
 import io.springlens.starter.probe.LensProbeAspect;
 import io.springlens.starter.probe.LensProbeCaptureService;
 import io.springlens.starter.probe.LensProbeRegistry;
-import io.springlens.starter.probe.LensProjectToolRegistry;
 import io.springlens.starter.probe.LensValueSanitizer;
 import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -93,11 +102,38 @@ public class LensRuntimeAutoConfiguration {
     // ==========================================
 
     @Bean
+    public LensObservationContextAccessor lensObservationContextAccessor() {
+        return new LensObservationContextAccessor();
+    }
+
+    @Bean
     public RuntimeExecutionContextHolder runtimeExecutionContextHolder() {
         return new RuntimeExecutionContextHolder();
     }
 
     @Bean
+    @ConditionalOnExpression("'${spring.lens.observation-native-enabled:true}' == 'true' and '${spring.lens.compatibility-instrumentation-enabled:true}' == 'false'")
+    public LensObservationExecutionBridge lensObservationExecutionBridge(
+            RuntimeSignalProcessor signalProcessor,
+            RuntimeExecutionContextHolder contextHolder,
+            LensRuntimeProperties properties,
+            Environment environment,
+            LensObservationContextAccessor contextAccessor
+    ) {
+        return new LensObservationExecutionBridge(signalProcessor, contextHolder, properties, environment, contextAccessor);
+    }
+
+    @Bean
+    @ConditionalOnExpression("'${spring.lens.observation-native-enabled:true}' == 'true' and '${spring.lens.compatibility-instrumentation-enabled:true}' == 'false'")
+    public ObservationHandler<Observation.Context> lensObservationHandler(
+            LensObservationExecutionBridge executionBridge,
+            LensObservationContextAccessor contextAccessor
+    ) {
+        return new LensObservationHandler(executionBridge, contextAccessor);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "spring.lens", name = "compatibility-instrumentation-enabled", havingValue = "true", matchIfMissing = true)
     public LensRequestFilter lensRequestFilter(
             RuntimeSignalProcessor signalProcessor,
             RuntimeExecutionContextHolder contextHolder,
@@ -108,6 +144,7 @@ public class LensRuntimeAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "spring.lens", name = "compatibility-instrumentation-enabled", havingValue = "true", matchIfMissing = true)
     public LensExceptionInterceptor lensExceptionInterceptor(
             RuntimeSignalProcessor signalProcessor,
             RuntimeExecutionContextHolder contextHolder
@@ -116,11 +153,13 @@ public class LensRuntimeAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "spring.lens", name = "compatibility-instrumentation-enabled", havingValue = "true", matchIfMissing = true)
     public RuntimeWebMvcConfiguration runtimeWebMvcConfiguration(LensExceptionInterceptor exceptionInterceptor) {
         return new RuntimeWebMvcConfiguration(exceptionInterceptor);
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "spring.lens", name = "compatibility-instrumentation-enabled", havingValue = "true", matchIfMissing = true)
     public JdbcObservationAspect jdbcObservationAspect(
             RuntimeSignalProcessor signalProcessor,
             RuntimeExecutionContextHolder contextHolder,
@@ -159,34 +198,40 @@ public class LensRuntimeAutoConfiguration {
     }
 
     @Bean
-    public LensCapabilityRegistry lensCapabilityRegistry(List<LensCapability> capabilities) {
-        return new LensCapabilityRegistry(capabilities);
+    public AnnotationToolCapability annotationToolCapability(
+            ApplicationContext applicationContext,
+            ObjectMapper objectMapper
+    ) {
+        return new AnnotationToolCapability(applicationContext, objectMapper);
     }
 
     @Bean
-    @ConditionalOnMissingBean(SkillGenerator.class)
-    public SkillGenerator skillGenerator(
+    @ConditionalOnMissingBean(CapabilityToolGenerator.class)
+    public CapabilityToolGenerator capabilityToolGenerator(
             InMemoryExecutionGraphStore graphStore,
             LensRuntimeProperties properties
     ) {
-        return new DefaultSkillGenerator(graphStore, properties);
+        return new DefaultCapabilityToolGenerator(graphStore, properties);
     }
 
     @Bean
-    public LensProjectToolRegistry lensProjectToolRegistry(
+    public GeneratedToolCapability generatedToolCapability(
             ApplicationContext applicationContext,
-            ObjectMapper objectMapper,
             LensProbeRegistry probeRegistry,
             ObjectProvider<RequestMappingHandlerMapping> requestMappingHandlerMapping,
-            ObjectProvider<SkillGenerator> skillGenerators
+            List<CapabilityToolGenerator> capabilityToolGenerators
     ) {
-        return new LensProjectToolRegistry(
+        return new GeneratedToolCapability(
                 applicationContext,
-                objectMapper,
                 probeRegistry,
                 requestMappingHandlerMapping.getIfAvailable(),
-                skillGenerators.orderedStream().toList()
+                capabilityToolGenerators
         );
+    }
+
+    @Bean
+    public LensCapabilityRegistry lensCapabilityRegistry(List<LensCapability> capabilities) {
+        return new LensCapabilityRegistry(capabilities);
     }
 
     @Bean
@@ -212,11 +257,21 @@ public class LensRuntimeAutoConfiguration {
     }
 
     @Bean
-    public LensDiagnosticTool lensDiagnosticTool(
+    public RequestDiagnosisCapability requestDiagnosisCapability(
             InMemoryExecutionGraphStore graphStore,
             DiagnosticEngine diagnosticEngine
     ) {
-        return new LensDiagnosticTool(graphStore, diagnosticEngine);
+        return new RequestDiagnosisCapability(graphStore, diagnosticEngine);
+    }
+
+    @Bean
+    public RuntimeSafetyInspector runtimeSafetyInspector(ApplicationContext applicationContext) {
+        return new RuntimeSafetyInspector(applicationContext);
+    }
+
+    @Bean
+    public RuntimeSafetyCapability runtimeSafetyCapability(RuntimeSafetyInspector inspector) {
+        return new RuntimeSafetyCapability(inspector);
     }
 
     // ==========================================
@@ -231,14 +286,13 @@ public class LensRuntimeAutoConfiguration {
             InMemoryExecutionGraphStore graphStore,
             LensRuntimeProperties properties,
             LensProbeRegistry probeRegistry,
-            LensProjectToolRegistry projectToolRegistry,
             LensCapabilityRegistry capabilityRegistry,
             Environment environment
     ) {
         if (properties.getApplicationId() == null || properties.getApplicationId().isBlank()) {
             properties.setApplicationId(environment.getProperty("spring.application.name", "spring-lens-app"));
         }
-        return new RuntimeQueryController(graphStore, properties, probeRegistry, projectToolRegistry, capabilityRegistry);
+        return new RuntimeQueryController(graphStore, properties, probeRegistry, capabilityRegistry);
     }
 
     @Bean

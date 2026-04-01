@@ -1,11 +1,14 @@
 package io.springlens.runtime;
 
+import io.springlens.model.core.ExecutionOriginKind;
 import io.springlens.model.core.NodeStatus;
 import io.springlens.model.core.NodeType;
 import io.springlens.spi.GraphMutation;
 import io.springlens.spi.RuntimeCollector;
 import io.springlens.spi.RuntimeSignal;
 import io.springlens.spi.RuntimeSignalType;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -33,17 +36,21 @@ public final class JdbcSlowSqlCollector implements RuntimeCollector {
             return;
         }
         
+        Map<String, Object> attributes = new LinkedHashMap<>(signal.attributes());
+        attributes.put("_originKind", ExecutionOriginKind.COMPAT_ASPECT.value());
+        attributes.put("_sourceRef", "io.springlens.starter.JdbcObservationAspect");
+
         String sqlNodeId = graph.addNode(
                 NodeType.JDBC_SQL,
                 "slow-sql",
                 NodeStatus.SUCCESS,
                 signal.occurredAt(),
                 signal.occurredAt(),
-                signal.attributes()
+                attributes
         );
         
         // 挂在请求入口父节点上
         graph.firstNodeId(NodeType.HTTP_REQUEST)
-                .ifPresent(requestNodeId -> graph.addEdge(requestNodeId, sqlNodeId, "executes"));
+                .ifPresent(requestNodeId -> graph.addEdge(requestNodeId, sqlNodeId, "child_of"));
     }
 }

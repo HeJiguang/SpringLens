@@ -23,6 +23,8 @@
         <module>spring-lens-spi</module>
         <module>spring-lens-runtime</module>
         <module>spring-lens-starter</module>
+        <module>spring-lens-agent-contract</module>
+        <module>spring-lens-agent-starter</module>
         <module>spring-lens-server</module>
         <module>spring-lens-demo-app</module>
     </modules>

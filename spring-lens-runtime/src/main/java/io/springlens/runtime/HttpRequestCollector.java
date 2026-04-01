@@ -1,12 +1,13 @@
 package io.springlens.runtime;
 
+import io.springlens.model.core.ExecutionOriginKind;
 import io.springlens.model.core.NodeStatus;
 import io.springlens.model.core.NodeType;
 import io.springlens.spi.GraphMutation;
 import io.springlens.spi.RuntimeCollector;
 import io.springlens.spi.RuntimeSignal;
 import io.springlens.spi.RuntimeSignalType;
-
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,7 +39,10 @@ public final class HttpRequestCollector implements RuntimeCollector {
             graph.putContextTag("method", String.valueOf(signal.attributes().getOrDefault("method", "GET")));
             
             // 确保图中创建了一个代表 HTTP 入口的根节点
-            graph.ensureNode(NodeType.HTTP_REQUEST, path, signal.occurredAt(), signal.attributes());
+            Map<String, Object> attributes = new LinkedHashMap<>(signal.attributes());
+            attributes.putIfAbsent("_originKind", ExecutionOriginKind.COMPAT_FILTER.value());
+            attributes.putIfAbsent("_sourceRef", "io.springlens.starter.LensRequestFilter");
+            graph.ensureNode(NodeType.HTTP_REQUEST, path, signal.occurredAt(), attributes);
             return;
         }
 

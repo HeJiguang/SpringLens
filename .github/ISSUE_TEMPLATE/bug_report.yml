@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a reproducible defect in Spring Lens
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Exact steps, commands, or requests to reproduce the issue
+      placeholder: |
+        1. Run ...
+        2. Call ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: input
+    id: module
+    attributes:
+      label: Affected module
+      placeholder: spring-lens-starter / spring-lens-server / spring-lens-agent-contract
+    validations:
+      required: true
+  - type: input
+    id: java_version
+    attributes:
+      label: Java version
+      placeholder: 21 / 24
+  - type: input
+    id: maven_version
+    attributes:
+      label: Maven version
+      placeholder: 3.9.x
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or stack trace
+      render: text

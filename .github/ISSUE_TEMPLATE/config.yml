@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Support
+    url: https://github.com/HeJiguang/SpringLens/blob/main/SUPPORT.md
+    about: Ask usage questions or request guidance before opening a bug report.
+  - name: Security policy
+    url: https://github.com/HeJiguang/SpringLens/blob/main/SECURITY.md
+    about: Report suspected vulnerabilities through the security policy process.

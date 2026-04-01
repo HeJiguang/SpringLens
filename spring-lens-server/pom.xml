@@ -15,6 +15,11 @@
     <dependencies>
         <dependency>
             <groupId>io.springlens</groupId>
+            <artifactId>spring-lens-agent-contract</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springlens</groupId>
             <artifactId>spring-lens-model</artifactId>
             <version>${project.version}</version>
         </dependency>

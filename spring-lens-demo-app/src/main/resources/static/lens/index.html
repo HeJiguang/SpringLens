@@ -25,7 +25,7 @@
                 <span class="pill pill-accent">Slow SQL</span>
                 <span class="pill pill-accent">Exception Context</span>
                 <span class="pill pill-accent">Programmable Probes</span>
-                <span class="pill pill-accent">Project Tools</span>
+                <span class="pill pill-accent">Runtime Tools</span>
             </div>
         </div>
         <aside class="hero-panel">
@@ -73,8 +73,8 @@
                     <p>Supports <code>@LensWatch</code> and <code>Lens.look(...)</code> to expose business-level runtime values.</p>
                 </article>
                 <article class="capability-card">
-                    <h3>Project Tools</h3>
-                    <p>Supports <code>@LensTool</code> so application code can expose callable diagnostic functions.</p>
+                    <h3>Runtime Tools</h3>
+                    <p>Supports <code>@LensTool</code> so application code can expose callable runtime functions.</p>
                 </article>
             </div>
         </section>
@@ -103,9 +103,9 @@
                     <p>AI tools: <code>query_probe_values</code>, <code>get_execution_graph</code></p>
                 </article>
                 <article class="mapping-card">
-                    <h3>Project Tool Path</h3>
-                    <p>Page action: <strong>Invoke Project Tool</strong></p>
-                    <p>AI tools: <code>list_project_tools</code>, <code>invoke_project_tool</code></p>
+                    <h3>Runtime Tool Path</h3>
+                    <p>Page action: <strong>Invoke Runtime Tool</strong></p>
+                    <p>AI tools: <code>list_runtime_tools</code>, <code>invoke_runtime_tool</code></p>
                 </article>
             </div>
         </section>
@@ -136,8 +136,8 @@
                     <span class="action-desc">Run the demo probe flow and inspect <code>@LensWatch</code> plus manual probe values.</span>
                 </button>
                 <button class="action-button" data-action="project-tool">
-                    <span class="action-title">Invoke Project Tool</span>
-                    <span class="action-desc">List project tools and invoke <code>count_orders_by_status</code> with <code>PAID</code>.</span>
+                    <span class="action-title">Invoke Runtime Tool</span>
+                    <span class="action-desc">List runtime tools and invoke <code>count_orders_by_status</code> with <code>PAID</code>.</span>
                 </button>
             </div>
             <div class="feedback-row">
@@ -190,10 +190,10 @@
             <div class="section-head">
                 <div>
                     <p class="section-kicker">Result Panel</p>
-                    <h2>Project Tool</h2>
+                    <h2>Runtime Tool</h2>
                 </div>
             </div>
-            <div id="tool-result" class="result-block empty-state">No project tool invocation yet.</div>
+            <div id="tool-result" class="result-block empty-state">No runtime tool invocation yet.</div>
         </section>
 
         <section class="card full-span">

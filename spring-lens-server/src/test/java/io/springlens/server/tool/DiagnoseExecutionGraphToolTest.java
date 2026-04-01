@@ -4,7 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.springlens.model.AppRegistration;
-import io.springlens.model.ProjectToolSchemaDescriptor;
+import io.springlens.model.RuntimeToolDescriptor;
+import io.springlens.model.RuntimeToolSchemaDescriptor;
 import io.springlens.model.core.ExecutionContext;
 import io.springlens.model.core.ExecutionGraph;
 import io.springlens.model.diagnostic.DiagnosticResult;
@@ -102,17 +103,17 @@ class DiagnoseExecutionGraphToolTest {
         }
 
         @Override
-        public List<io.springlens.model.ProjectToolDescriptor> listProjectTools(AppRegistration registration) {
+        public List<RuntimeToolDescriptor> listRuntimeTools(AppRegistration registration) {
             return List.of();
         }
 
         @Override
-        public List<ProjectToolSchemaDescriptor> listProjectToolSchemas(AppRegistration registration) {
+        public List<RuntimeToolSchemaDescriptor> listRuntimeToolSchemas(AppRegistration registration) {
             return List.of();
         }
 
         @Override
-        public Object invokeProjectTool(AppRegistration registration, String toolName, Map<String, Object> arguments) {
+        public Object invokeRuntimeTool(AppRegistration registration, String toolName, Map<String, Object> arguments) {
             return Map.of();
         }
 

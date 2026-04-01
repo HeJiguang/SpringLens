@@ -25,7 +25,7 @@ class SpringLensRegistrationIntegrationTests {
     void startsWhenRuntimeRegistrationIsEnabled() {
         String response = RestClient.create()
                 .get()
-                .uri("http://localhost:" + port + "/internal/spring-lens/project-tools")
+                .uri("http://localhost:" + port + "/internal/spring-lens/tools")
                 .retrieve()
                 .body(String.class);
 

@@ -1,6 +1,10 @@
 target/
+.m2-repo/
 .worktrees/
 worktrees/
 .idea/
 .vscode/
 *.iml
+*.log
+temp/
+docs/superpowers/

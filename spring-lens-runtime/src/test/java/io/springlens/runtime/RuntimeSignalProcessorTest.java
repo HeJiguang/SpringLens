@@ -1,6 +1,11 @@
 package io.springlens.runtime;
 
 import io.springlens.model.core.ExecutionContext;
+import io.springlens.model.core.ExecutionEntrypointKind;
+import io.springlens.model.core.ExecutionGraph;
+import io.springlens.model.core.ExecutionOriginKind;
+import io.springlens.model.core.ExecutionTransportKind;
+import io.springlens.model.core.NodeType;
 import io.springlens.spi.RuntimeSignal;
 import io.springlens.spi.RuntimeSignalType;
 import java.time.Instant;
@@ -76,5 +81,21 @@ class RuntimeSignalProcessorTest {
                     assertThat(record.message()).isEqualTo("boom");
                     assertThat(record.requestPath()).isEqualTo("/orders/slow");
                 });
+
+        ExecutionGraph graph = store.findGraph("request-1").orElseThrow();
+        assertThat(graph.context().traceId()).isEqualTo("request-1");
+        assertThat(graph.context().entrypointKind()).isEqualTo(ExecutionEntrypointKind.HTTP_SERVER);
+        assertThat(graph.context().transportKind()).isEqualTo(ExecutionTransportKind.HTTP);
+        assertThat(graph.nodes()).filteredOn(node -> NodeType.HTTP_REQUEST.equals(node.type()))
+                .singleElement()
+                .satisfies(node -> assertThat(node.originKind()).isEqualTo(ExecutionOriginKind.COMPAT_FILTER));
+        assertThat(graph.nodes()).filteredOn(node -> NodeType.JDBC_SQL.equals(node.type()))
+                .singleElement()
+                .satisfies(node -> assertThat(node.originKind()).isEqualTo(ExecutionOriginKind.COMPAT_ASPECT));
+        assertThat(graph.nodes()).filteredOn(node -> NodeType.EXCEPTION.equals(node.type()))
+                .singleElement()
+                .satisfies(node -> assertThat(node.originKind()).isEqualTo(ExecutionOriginKind.COMPAT_INTERCEPTOR));
+        assertThat(graph.edges()).hasSize(2)
+                .allSatisfy(edge -> assertThat(edge.relation()).isEqualTo("child_of"));
     }
 }

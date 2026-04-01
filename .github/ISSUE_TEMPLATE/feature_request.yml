@@ -1,0 +1,36 @@
+name: Feature request
+description: Suggest a new capability, control-plane flow, or runtime tool
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What problem should Spring Lens solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the capability or behavior you want
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - starter
+        - runtime
+        - server control plane
+        - agent contract
+        - MCP
+        - documentation
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any other approaches you evaluated

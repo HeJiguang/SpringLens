@@ -4,6 +4,7 @@ import io.springlens.model.core.ExecutionContext;
 import io.springlens.model.core.ExecutionEdge;
 import io.springlens.model.core.ExecutionGraph;
 import io.springlens.model.core.ExecutionNode;
+import io.springlens.model.core.ExecutionOriginKind;
 import io.springlens.model.core.NodeStatus;
 import io.springlens.model.core.NodeType;
 import io.springlens.spi.GraphMutation;
@@ -37,8 +38,18 @@ final class MutableExecutionGraph implements GraphMutation {
                 seedContext.applicationId(),
                 seedContext.instanceId(),
                 seedContext.executionId(),
+                seedContext.traceId(),
+                seedContext.spanId(),
+                seedContext.parentSpanId(),
+                seedContext.entrypointKind(),
+                seedContext.transportKind(),
+                seedContext.serviceName(),
+                seedContext.environment(),
                 seedContext.startedAt(),
-                contextTags
+                contextTags,
+                seedContext.activeOverlayIds(),
+                seedContext.activePatchIds(),
+                seedContext.captureMode()
         );
     }
 
@@ -153,7 +164,34 @@ final class MutableExecutionGraph implements GraphMutation {
         }
 
         private ExecutionNode toNode() {
-            return new ExecutionNode(nodeId, type, name, status, startedAt, endedAt, attributes);
+            return new ExecutionNode(
+                    nodeId,
+                    type,
+                    name,
+                    resolveOriginKind(),
+                    resolveSourceRef(),
+                    status,
+                    startedAt,
+                    endedAt,
+                    visibleAttributes()
+            );
+        }
+
+        private ExecutionOriginKind resolveOriginKind() {
+            Object value = attributes.get("_originKind");
+            return value == null ? ExecutionOriginKind.BASE : ExecutionOriginKind.of(String.valueOf(value));
+        }
+
+        private String resolveSourceRef() {
+            Object value = attributes.get("_sourceRef");
+            return value == null ? null : String.valueOf(value);
+        }
+
+        private Map<String, Object> visibleAttributes() {
+            Map<String, Object> visible = new LinkedHashMap<>(attributes);
+            visible.remove("_originKind");
+            visible.remove("_sourceRef");
+            return visible;
         }
     }
 }
