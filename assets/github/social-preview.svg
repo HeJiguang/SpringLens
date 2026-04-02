@@ -1,0 +1,53 @@
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="48" y1="48" x2="1232" y2="592" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1320"/>
+      <stop offset="1" stop-color="#11273E"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#0F1E30"/>
+      <stop offset="1" stop-color="#17344F"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#44D4FF"/>
+      <stop offset="1" stop-color="#7CFFB2"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#06101C" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="1280" height="640" rx="0" fill="url(#bg)"/>
+  <circle cx="1120" cy="110" r="220" fill="#123B5C" fill-opacity="0.32"/>
+  <circle cx="170" cy="520" r="180" fill="#0D6B73" fill-opacity="0.2"/>
+
+  <rect x="60" y="56" width="1160" height="528" rx="28" fill="#0B1726" fill-opacity="0.72" stroke="#2E506C" stroke-opacity="0.7"/>
+
+  <text x="100" y="138" fill="#86E8FF" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700">SPRING LENS</text>
+  <text x="100" y="214" fill="#F4FBFF" font-family="Segoe UI, Arial, sans-serif" font-size="54" font-weight="700">Runtime control plane for coding agents</text>
+  <text x="100" y="268" fill="#A8C2D8" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="400">Turn a Spring Boot app into an agent-callable runtime system for Codex, Cursor, and CloudCode.</text>
+
+  <rect x="100" y="332" width="330" height="84" rx="22" fill="url(#card)" stroke="#365F7C" filter="url(#shadow)"/>
+  <text x="128" y="365" fill="#87E8FF" font-family="Consolas, Segoe UI Mono, monospace" font-size="18" font-weight="700">1</text>
+  <text x="128" y="394" fill="#F4FBFF" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700">inspect_runtime_safety</text>
+
+  <rect x="474" y="332" width="330" height="84" rx="22" fill="url(#card)" stroke="#365F7C" filter="url(#shadow)"/>
+  <text x="502" y="365" fill="#87E8FF" font-family="Consolas, Segoe UI Mono, monospace" font-size="18" font-weight="700">2</text>
+  <text x="502" y="394" fill="#F4FBFF" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700">draft_runtime_safety</text>
+  <text x="502" y="423" fill="#F4FBFF" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700">_remediation</text>
+
+  <rect x="848" y="332" width="330" height="84" rx="22" fill="url(#card)" stroke="#365F7C" filter="url(#shadow)"/>
+  <text x="876" y="365" fill="#87E8FF" font-family="Consolas, Segoe UI Mono, monospace" font-size="18" font-weight="700">3</text>
+  <text x="876" y="394" fill="#F4FBFF" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700">promote_runtime_safety</text>
+  <text x="876" y="423" fill="#F4FBFF" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700">_remediation</text>
+
+  <path d="M432 374H462" stroke="url(#accent)" stroke-width="6" stroke-linecap="round"/>
+  <path d="M806 374H836" stroke="url(#accent)" stroke-width="6" stroke-linecap="round"/>
+
+  <rect x="100" y="470" width="520" height="70" rx="20" fill="#0E2236" stroke="#2F5874"/>
+  <text x="126" y="514" fill="#DDF7FF" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="600">ExecutionGraph + runtime safety findings + reviewable drafts</text>
+
+  <rect x="650" y="470" width="528" height="70" rx="20" fill="#0E2236" stroke="#2F5874"/>
+  <text x="676" y="514" fill="#DDF7FF" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="600">Built for governed agent workflows, not log-only debugging</text>
+</svg>
+
