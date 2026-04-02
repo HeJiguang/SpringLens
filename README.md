@@ -5,9 +5,24 @@
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
-Spring Lens turns a Spring Boot application into an agent-callable runtime system for Codex, Cursor, CloudCode, and other MCP clients.
+Spring Lens is a runtime control plane for Spring Boot applications. It gives coding agents a structured way to inspect live behavior, ask high-value runtime questions, and turn findings into reviewable remediation workflows.
 
 ![Spring Lens overview](./assets/github/social-preview.svg)
+
+## Why Spring Lens
+
+Most coding agents can read source code well. They are much weaker at answering the harder questions that only show up at runtime:
+
+- What actually happened in this request?
+- Which SQL call was slow?
+- What state was present when the exception was thrown?
+- Is this service carrying concurrency or retention risks that are not obvious in a code diff?
+
+Spring Lens addresses that gap by exposing runtime truth as:
+
+- execution graphs instead of log archaeology
+- task-oriented tools instead of raw bean dumps
+- governed remediation flows instead of ad hoc instrumentation
 
 ## Architecture
 
@@ -43,9 +58,9 @@ flowchart LR
    mvn -f spring-lens-demo-app/pom.xml spring-boot:run "-Dspring-boot.run.arguments=--server.port=8081 --spring.lens.registration-enabled=true --spring.lens.server-url=http://localhost:8090 --spring.lens.runtime-base-url=http://localhost:8081"
    ```
 
-## Real Demo Flow
+## Demo Flow
 
-This is the product loop worth showing in a 30 to 60 second GIF:
+The clearest end-to-end flow in the current repository is:
 
 1. Trigger a request against the demo app.
 
@@ -53,47 +68,33 @@ This is the product loop worth showing in a 30 to 60 second GIF:
    GET http://localhost:8081/orders/fail
    ```
 
-2. Ask Spring Lens what is unsafe in the live runtime.
+2. Inspect runtime safety in the live application.
 
    ```text
    inspect_runtime_safety
    ```
 
-3. Ask Spring Lens to turn those findings into reviewable remediation drafts.
+3. Draft remediation from those findings.
 
    ```text
    draft_runtime_safety_remediation
    ```
 
-4. Promote the approved draft into the control plane.
+4. Promote the reviewed remediation into the control plane.
 
    ```text
    promote_runtime_safety_remediation
    ```
 
-This gives coding agents a higher-level workflow than "read logs and guess":
+That flow is what makes Spring Lens different from a debugging helper. It connects live runtime evidence to a governed remediation path.
 
-- inspect concrete runtime safety risks
-- generate overlay and patch drafts
-- promote reviewed remediation into a governed control plane
+## What It Helps With
 
-## What Spring Lens Helps Coding Agents Do
-
-- Inspect runtime behavior through execution graphs instead of raw log scraping.
-- Ask high-level runtime questions such as slow SQL, exception context, and safety risks.
-- Turn runtime findings into reviewable overlays and patch drafts instead of ad hoc debugging notes.
-- Keep runtime, server, and governance concerns separated so agent workflows stay auditable.
-- Extend project-specific tools through SPI and `@LensTool` without coupling business logic into the core.
-
-## Why It Exists
-
-Most coding agents can read source code well, but they are weak at understanding what a Spring Boot service is doing right now.
-
-Spring Lens gives them a runtime surface that is:
-
-- task-oriented instead of dump-oriented
-- structured instead of log-shaped
-- governable instead of letting an agent improvise instrumentation directly in production
+- Inspect real request behavior through execution graphs.
+- Pull slow SQL and exception context without adding one-off debug endpoints.
+- Expose project-specific runtime tools through SPI and `@LensTool`.
+- Detect runtime safety issues before proposing concurrency-related fixes.
+- Turn findings into reviewable overlay and patch drafts.
 
 ## Modules
 
@@ -108,13 +109,13 @@ Spring Lens gives them a runtime surface that is:
 - `spring-lens-agent-contract`
   Shared contracts for overlays, patch drafts, and instrumentation governance.
 - `spring-lens-agent-starter`
-  Higher-trust agent extension for overlay sync and future instrumentation control.
+  Higher-trust extension for overlay sync and future instrumentation control.
 - `spring-lens-server`
   External control plane, tool router, MCP surface, and governance flows.
 - `spring-lens-demo-app`
   Runnable H2-backed demo application used by tests and demos.
 
-## Built-in Tooling
+## Built-in Tools
 
 Runtime and diagnosis:
 
@@ -142,28 +143,28 @@ Control plane:
 - `draft_runtime_safety_remediation`
 - `promote_runtime_safety_remediation`
 
-## Agent Integrations
+## Integrations
 
-Spring Lens includes repository-local integration guides and reusable skills:
+Spring Lens includes repository-local onboarding material for editor and agent workflows:
 
 - [Codex integration guide](./docs/integrations/codex.md)
 - [CloudCode integration guide](./docs/integrations/cloudcode.md)
-- [Agent skills overview](./skills/README.md)
+- [Skills overview](./skills/README.md)
 - [Codex runtime safety skill](./skills/codex/spring-lens-runtime-safety/SKILL.md)
-- [CloudCode runtime safety skill](./skills/cloudcode/spring-lens-runtime-safety.md)
+- [CloudCode runtime safety guidance](./skills/cloudcode/spring-lens-runtime-safety.md)
 
-## Release
+## Release and Demo Assets
 
 - [v0.1.0 release notes](./docs/releases/v0.1.0.md)
 - [GitHub social preview source and usage notes](./assets/github/README.md)
-- [Show and tell discussion draft](./docs/community/show-and-tell-discussion.md)
+- [Runtime safety demo storyboard](./docs/demo/runtime-safety-flow.md)
+- [Show and tell discussion post](./docs/community/show-and-tell-discussion.md)
 
-## Detailed Docs
+## Additional Docs
 
-- [Product overview](./docs/overview.md)
+- [Project overview](./docs/overview.md)
 - [Codex integration](./docs/integrations/codex.md)
 - [CloudCode integration](./docs/integrations/cloudcode.md)
-- [Runtime safety demo storyboard](./docs/demo/runtime-safety-flow.md)
 
 ## Community
 

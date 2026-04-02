@@ -5,9 +5,24 @@
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
-Spring Lens 可以把一个 Spring Boot 应用变成一个可被 Codex、Cursor、CloudCode 以及其他 MCP 客户端直接调用的运行时系统。
+Spring Lens 是一个面向 Spring Boot 的运行时控制平面。它让 Coding Agent 不只会读源码，还能基于真实运行时行为完成排查、诊断和可审阅的治理流程。
 
 ![Spring Lens overview](./assets/github/social-preview.svg)
+
+## 为什么需要 Spring Lens
+
+多数 Coding Agent 很擅长读源码，但一到运行时问题就会明显变弱，例如：
+
+- 这次请求到底发生了什么？
+- 哪条 SQL 真正慢了？
+- 抛异常时上下文是什么？
+- 服务里有没有代码 diff 看不出来的并发风险或内存滞留风险？
+
+Spring Lens 解决的是这类问题。它把运行时真相暴露成：
+
+- ExecutionGraph，而不是日志考古
+- 面向任务的工具，而不是原始 bean dump
+- 可治理的 remediation flow，而不是临时加探针
 
 ## 架构图
 
@@ -43,9 +58,9 @@ flowchart LR
    mvn -f spring-lens-demo-app/pom.xml spring-boot:run "-Dspring-boot.run.arguments=--server.port=8081 --spring.lens.registration-enabled=true --spring.lens.server-url=http://localhost:8090 --spring.lens.runtime-base-url=http://localhost:8081"
    ```
 
-## 真实 Demo Flow
+## Demo Flow
 
-这条链路最值得做成 30 到 60 秒的 GIF：
+当前仓库里最值得演示的一条链路是：
 
 1. 先触发一次 demo 请求。
 
@@ -53,47 +68,33 @@ flowchart LR
    GET http://localhost:8081/orders/fail
    ```
 
-2. 让 Spring Lens 检查当前运行时里有哪些安全风险。
+2. 检查 live runtime 里的安全风险。
 
    ```text
    inspect_runtime_safety
    ```
 
-3. 让 Spring Lens 把这些风险转换成可审阅的治理草案。
+3. 基于这些发现生成 remediation draft。
 
    ```text
    draft_runtime_safety_remediation
    ```
 
-4. 把通过审阅的草案提升进控制平面。
+4. 把审阅通过的 remediation 提升进控制平面。
 
    ```text
    promote_runtime_safety_remediation
    ```
 
-这条链路的价值在于，Coding Agent 不再只是“读日志然后猜”：
+这条链路能体现 Spring Lens 的核心价值：把真实运行时证据连接到一个可治理、可审阅的修复流程里。
 
-- 先看到真实运行时里的安全风险
-- 再生成 overlay 和 patch 草案
-- 最后把结果放进可治理的控制平面
+## 它能解决什么问题
 
-## Spring Lens 能帮 Coding Agent 做什么
-
-- 用 ExecutionGraph 理解运行时行为，而不是只靠日志。
-- 直接提问高层运行时问题，例如慢 SQL、异常上下文、运行时安全风险。
-- 把运行时发现转换成可审阅的 overlay 和 patch draft，而不是零散的调试结论。
-- 保持 runtime、server、governance 解耦，让 agent 工作流可以被审计和治理。
-- 通过 SPI 和 `@LensTool` 扩展业务工具，而不是把业务逻辑硬塞进核心层。
-
-## 为什么要做它
-
-多数 Coding Agent 很擅长读源码，但并不真正知道一个 Spring Boot 服务现在正在做什么。
-
-Spring Lens 给它们提供的是一层运行时表面，而且这层表面具备几个特征：
-
-- 面向任务，而不是面向原始 dump
-- 结构化，而不是日志形状
-- 可治理，而不是让 agent 直接往线上写探针
+- 通过 ExecutionGraph 看清真实请求行为。
+- 不用额外加调试接口，就能拿到慢 SQL 和异常上下文。
+- 通过 SPI 和 `@LensTool` 暴露项目自己的运行时工具。
+- 在改并发相关代码之前先识别运行时安全风险。
+- 把运行时发现转换成可审阅的 overlay 和 patch draft。
 
 ## 模块
 
@@ -108,7 +109,7 @@ Spring Lens 给它们提供的是一层运行时表面，而且这层表面具�
 - `spring-lens-agent-contract`
   overlay、patch draft、instrumentation governance 的共享契约。
 - `spring-lens-agent-starter`
-  更高信任级别的 agent 扩展，用于 overlay 同步和后续 instrumentation 控制。
+  更高信任级别的扩展，用于 overlay 同步和后续 instrumentation 控制。
 - `spring-lens-server`
   外部控制平面、工具路由、MCP 接口和治理流。
 - `spring-lens-demo-app`
@@ -142,28 +143,28 @@ Spring Lens 给它们提供的是一层运行时表面，而且这层表面具�
 - `draft_runtime_safety_remediation`
 - `promote_runtime_safety_remediation`
 
-## Agent 接入
+## 接入文档
 
-仓库现在附带了可直接复用的接入文档和 skills：
+仓库附带了面向实际接入场景的文档和 skills：
 
 - [Codex 接入指南](./docs/integrations/codex.md)
 - [CloudCode 接入指南](./docs/integrations/cloudcode.md)
-- [Agent Skills 总览](./skills/README.md)
+- [Skills 总览](./skills/README.md)
 - [Codex runtime safety skill](./skills/codex/spring-lens-runtime-safety/SKILL.md)
-- [CloudCode runtime safety skill](./skills/cloudcode/spring-lens-runtime-safety.md)
+- [CloudCode runtime safety guidance](./skills/cloudcode/spring-lens-runtime-safety.md)
 
-## Release
+## Release 与演示资产
 
 - [v0.1.0 release notes](./docs/releases/v0.1.0.md)
 - [GitHub social preview 图源与使用说明](./assets/github/README.md)
-- [Show and tell Discussions 帖子草稿](./docs/community/show-and-tell-discussion.md)
+- [Runtime safety demo 脚本](./docs/demo/runtime-safety-flow.md)
+- [Show and tell Discussions 帖子](./docs/community/show-and-tell-discussion.md)
 
-## 详细文档
+## 更多文档
 
-- [产品说明](./docs/overview.md)
+- [项目概览](./docs/overview.md)
 - [Codex 接入](./docs/integrations/codex.md)
 - [CloudCode 接入](./docs/integrations/cloudcode.md)
-- [运行时安全演示脚本](./docs/demo/runtime-safety-flow.md)
 
 ## 社区
 

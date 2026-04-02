@@ -1,65 +1,45 @@
 # Spring Lens Overview
 
-Spring Lens is an AI runtime system for Spring Boot applications.
+Spring Lens is a runtime control plane for Spring Boot applications.
 
-Its job is not to replace tracing, APM, or logs. Its job is to give coding agents a safer and higher-level runtime interface for understanding what a Spring application is doing right now.
+It is built for a simple but important problem: coding agents can read source code well, but they are much less reliable when they have to infer live behavior from logs, stack traces, and framework internals.
 
-## Core idea
+Spring Lens gives them a better interface.
 
-Most coding agents are strong at:
+## What Spring Lens exposes
 
-- reading source code
-- proposing patches
-- reasoning about framework APIs
+Instead of exposing low-level implementation detail directly, Spring Lens exposes:
 
-Most coding agents are weak at:
+- execution graphs that describe what happened
+- runtime tools that answer task-oriented questions
+- remediation workflows that connect findings to reviewable next steps
 
-- reconstructing runtime behavior from fragmented logs
-- knowing whether a bug is still happening after a patch
-- asking bounded, high-value runtime questions
+That shape matters. It lets an agent move from "something looks wrong" to "here is a concrete finding and a reviewable remediation path" without inventing its own instrumentation story.
 
-Spring Lens closes that gap by turning runtime behavior into:
-
-- structured execution graphs
-- task-oriented runtime tools
-- governable overlay and patch-draft workflows
-
-## Product shape
+## Core design
 
 Spring Lens is split into two planes:
 
-- application-side runtime capture inside the Spring Boot service
-- external control-plane and MCP surface in `spring-lens-server`
+- application-side capture inside the Spring Boot service
+- an external control plane and MCP surface in `spring-lens-server`
 
-This separation matters because it keeps the runtime surface close to the app while keeping governance, routing, and agent-facing workflows outside the business service.
+That separation keeps runtime truth close to the application while preserving a clean boundary for governance, routing, and agent-facing workflows.
 
-## What makes it useful to coding agents
+## Where it is strongest today
 
-Spring Lens is optimized for questions an agent can act on:
-
-- What request failed and why?
-- Which SQL call was slow?
-- What did the execution graph look like?
-- Is this service carrying runtime safety risks such as singleton `ThreadLocal` state?
-- What remediation should be proposed and promoted?
-
-That is a very different shape from exposing low-level bean dumps or raw framework internals.
-
-## Runtime safety loop
-
-The most compelling end-to-end flow in the current repository is:
+The strongest current path in the repository is runtime safety inspection and remediation drafting:
 
 1. `inspect_runtime_safety`
 2. `draft_runtime_safety_remediation`
 3. `promote_runtime_safety_remediation`
 
-This is the shortest path from "the runtime looks unsafe" to "a governable remediation draft exists in the control plane".
+That path is a good summary of the project itself. Spring Lens is not only about observing runtime behavior. It is about making runtime findings actionable and governable.
 
-## Intended open-source positioning
+## Intended positioning
 
-Spring Lens should be described as:
+The most useful way to describe Spring Lens is:
 
-> The runtime control plane that helps coding agents understand and remediate Spring Boot behavior.
+> A runtime control plane that helps coding agents understand and remediate Spring Boot behavior.
 
-That positioning is stronger than describing it as a generic MCP server or another observability wrapper.
+That is more precise than calling it a generic MCP server, observability wrapper, or agent plugin framework.
 
