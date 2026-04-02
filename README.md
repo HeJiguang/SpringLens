@@ -7,7 +7,7 @@
 
 Spring Lens turns a Spring Boot application into an agent-callable runtime system for Codex, Cursor, CloudCode, and other MCP clients.
 
-![Spring Lens social preview source](./assets/github/social-preview.svg)
+![Spring Lens overview](./assets/github/social-preview.svg)
 
 ## Architecture
 
@@ -93,7 +93,7 @@ Spring Lens gives them a runtime surface that is:
 
 - task-oriented instead of dump-oriented
 - structured instead of log-shaped
-- governable instead of "agent wrote instrumentation directly into prod"
+- governable instead of letting an agent improvise instrumentation directly in production
 
 ## Modules
 
@@ -144,7 +144,7 @@ Control plane:
 
 ## Agent Integrations
 
-Spring Lens now ships repository-local integration guides and reusable skills:
+Spring Lens includes repository-local integration guides and reusable skills:
 
 - [Codex integration guide](./docs/integrations/codex.md)
 - [CloudCode integration guide](./docs/integrations/cloudcode.md)
@@ -154,7 +154,7 @@ Spring Lens now ships repository-local integration guides and reusable skills:
 
 ## Release
 
-- [v0.1.0 release notes draft](./docs/releases/v0.1.0.md)
+- [v0.1.0 release notes](./docs/releases/v0.1.0.md)
 - [GitHub social preview source and usage notes](./assets/github/README.md)
 - [Show and tell discussion draft](./docs/community/show-and-tell-discussion.md)
 

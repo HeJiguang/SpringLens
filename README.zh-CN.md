@@ -5,9 +5,9 @@
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
-Spring Lens 会把一个 Spring Boot 应用变成一个可被 Codex、Cursor、CloudCode 以及其他 MCP 客户端直接调用的运行时系统。
+Spring Lens 可以把一个 Spring Boot 应用变成一个可被 Codex、Cursor、CloudCode 以及其他 MCP 客户端直接调用的运行时系统。
 
-![Spring Lens social preview source](./assets/github/social-preview.svg)
+![Spring Lens overview](./assets/github/social-preview.svg)
 
 ## 架构图
 
@@ -24,7 +24,7 @@ flowchart LR
 
 ## 快速开始
 
-1. 先构建并跑完整测试。
+1. 先构建并运行完整测试。
 
    ```bash
    mvn test
@@ -59,7 +59,7 @@ flowchart LR
    inspect_runtime_safety
    ```
 
-3. 让 Spring Lens 把这些风险转成可审阅的治理草案。
+3. 让 Spring Lens 把这些风险转换成可审阅的治理草案。
 
    ```text
    draft_runtime_safety_remediation
@@ -73,7 +73,7 @@ flowchart LR
 
 这条链路的价值在于，Coding Agent 不再只是“读日志然后猜”：
 
-- 它先看真实运行时的安全风险
+- 先看到真实运行时里的安全风险
 - 再生成 overlay 和 patch 草案
 - 最后把结果放进可治理的控制平面
 
@@ -81,17 +81,17 @@ flowchart LR
 
 - 用 ExecutionGraph 理解运行时行为，而不是只靠日志。
 - 直接提问高层运行时问题，例如慢 SQL、异常上下文、运行时安全风险。
-- 把运行时发现转成可审阅的 overlay 和 patch draft，而不是临时调试笔记。
+- 把运行时发现转换成可审阅的 overlay 和 patch draft，而不是零散的调试结论。
 - 保持 runtime、server、governance 解耦，让 agent 工作流可以被审计和治理。
 - 通过 SPI 和 `@LensTool` 扩展业务工具，而不是把业务逻辑硬塞进核心层。
 
 ## 为什么要做它
 
-多数 Coding Agent 很擅长读源码，但并不真正知道一个 Spring Boot 服务“现在正在干什么”。
+多数 Coding Agent 很擅长读源码，但并不真正知道一个 Spring Boot 服务现在正在做什么。
 
 Spring Lens 给它们提供的是一层运行时表面，而且这层表面具备几个特征：
 
-- 面向任务，而不是面向原始数据 dump
+- 面向任务，而不是面向原始 dump
 - 结构化，而不是日志形状
 - 可治理，而不是让 agent 直接往线上写探针
 
@@ -154,7 +154,7 @@ Spring Lens 给它们提供的是一层运行时表面，而且这层表面具�
 
 ## Release
 
-- [v0.1.0 release notes 草稿](./docs/releases/v0.1.0.md)
+- [v0.1.0 release notes](./docs/releases/v0.1.0.md)
 - [GitHub social preview 图源与使用说明](./assets/github/README.md)
 - [Show and tell Discussions 帖子草稿](./docs/community/show-and-tell-discussion.md)
 
